@@ -128,6 +128,7 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api', authRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Serve the backend dams-data.json file for the frontend
