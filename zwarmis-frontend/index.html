@@ -4474,9 +4474,9 @@ function updateDateTime() {
 async function loadDamData() {
     const sources = [];
     if (window.location.protocol.startsWith('http')) {
-        sources.push('/dams-data.json', 'http://localhost:3002/dams-data.json');
+        sources.push('/dams-data.json', 'http://localhost:8081/dams-data.json');
     } else {
-        sources.push('./dams-data.json', 'http://localhost:3002/dams-data.json');
+        sources.push('./dams-data.json', 'http://localhost:8081/dams-data.json');
     }
 
     let data = null;
@@ -4981,7 +4981,7 @@ function submitCredentials() {
     submitBtn.disabled = true;
 
     // Call backend to send verification code
-    fetch('/api/send-verification-code', {
+    fetch('/api/auth/send-verification-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name })
@@ -5069,7 +5069,7 @@ function verifyCode() {
         statusDiv.style.display = 'block';
     }
 
-    fetch('/api/verify-code', {
+    fetch('/api/auth/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -5126,7 +5126,7 @@ function requestNewCode() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
     btn.disabled = true;
 
-    fetch('/api/resend-verification-code', {
+    fetch('/api/auth/resend-verification-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

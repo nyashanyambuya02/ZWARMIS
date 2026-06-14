@@ -31,7 +31,7 @@ function isAllowedCorsOrigin(origin) {
 }
 
 module.exports = {
-  PORT: process.env.PORT || 3002,
+  PORT: process.env.PORT || 8081,
   NODE_ENV: process.env.NODE_ENV || 'development',
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
   SESSION_SECRET: process.env.SESSION_SECRET || 'zwarmis-secret-key-2026',
