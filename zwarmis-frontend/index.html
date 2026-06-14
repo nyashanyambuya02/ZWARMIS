@@ -175,7 +175,7 @@
     object-fit : cover !important;
     background-position: center !important;
  margin: 0 !important;
- padding: 0 !important;
+ padding: 0 !importyant;
  boarder-radius: 0 !important;
  transform: scale (1.06);
  filter: hue-rotation(-30deg) saturation(1.3) brightness(1.1);
@@ -669,16 +669,16 @@
         .swiper-slide {
             background: var(--deep-blue);
             border-radius: var(--radius-md);
-            padding: 15px;
+            padding: 10px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--royal-blue);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-width: 140px;
-            max-width: 160px;
-            height: 140px;
+            min-width: 110px;
+            max-width: 120px;
+            height: 100px;
             position: relative;
             overflow: hidden;
             animation: slideIn 0.5s ease-out;
@@ -789,7 +789,7 @@
         .dams-tab {
     flex: 1;
     padding: 6px 8px;
-    background: rgba(203, 213, 224, 0.4);
+    background: rgbargba(203, 213, 224, 0.4);
     border: none;
     border-radius: var(--radius-sm);
     font-size: 0.6rem;
@@ -2633,7 +2633,7 @@
 
 .settings-option {
     flex: 1;
-    min-width: 140px;
+    min-width: 110px;
     padding: 12px 16px;
     background: rgba(203, 213, 224, 0.15);
     border-radius: 12px;
@@ -3708,7 +3708,7 @@ function updateCapacityChart() {
                 data: [criticalCount, moderateCount, optimalCount],
                 backgroundColor: [
                     'rgba(139,  69,  19,  0.85)',
-                    'rgba(135,  206,  235,  0.85)',
+                    'rgbargba(135,  206,  235,  0.85)',
                     'rgba(3,  105,  161,  0.85)'
                 ],
                 borderWidth: 0,
@@ -5398,53 +5398,78 @@ function submitDamUpdate() {
         return;
     }
 
-    // Find and update the dam
-    const damIndex = CURRENT_DAMS.findIndex(d => d.id === damId);
-    if (damIndex !== -1) {
-        const oldCapacity = CURRENT_DAMS[damIndex].capacity_percent;
-        CURRENT_DAMS[damIndex].capacity_percent = newCapacity;
-        CURRENT_DAMS[damIndex].last_updated = new Date().toISOString().slice(0, 10);
+    // Show loading state
+    const btn = event.target || document.querySelector(".btn-submit");
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Updating...`;
+        btn.disabled = true;
+    }
 
-        // Also update in JSON_DATA history if exists
-        if (JSON_DATA && JSON_DATA.history) {
-            if (!JSON_DATA.history[damId]) JSON_DATA.history[damId] = [];
-            JSON_DATA.history[damId].push({
-                date: new Date().toISOString().slice(0, 10),
-                capacity: newCapacity,
-                notes: notes
-            });
+    fetch("/api/admin/update-dam", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ damId, capacity_percent: newCapacity, notes })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
+        if (data.success) {
+            const damIndex = CURRENT_DAMS.findIndex(d => d.id === damId);
+            if (damIndex !== -1) {
+                CURRENT_DAMS[damIndex] = data.dam;
+                if (JSON_DATA && JSON_DATA.history) {
+                    if (!JSON_DATA.history[damId]) JSON_DATA.history[damId] = [];
+                    JSON_DATA.history[damId].push({
+                        date: new Date().toISOString().slice(0, 10),
+                        capacity: newCapacity,
+                        notes: notes
+                    });
+                }
+                const damName = data.dam.name;
+                if (resultDiv) {
+                    resultDiv.className = "update-result success";
+                    resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> ✓ ${damName} updated to ${newCapacity.toFixed(1)}%`;
+                    resultDiv.style.display = "block";
+                }
+                updateDashboard();
+            }
 
-        const damName = CURRENT_DAMS[damIndex].name;
-        if (resultDiv) {
-            resultDiv.className = 'update-result success';
-            resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> ✓ ${damName} updated from ${oldCapacity.toFixed(1)}% to ${newCapacity.toFixed(1)}%`;
-            resultDiv.style.display = 'block';
+            // Clear form
+            const capacityInput = document.getElementById('newCapacity');
+            if (capacityInput) capacityInput.value = '';
+
+            const notesInput = document.getElementById('updateNotes');
+            if (notesInput) notesInput.value = '';
+
+            setTimeout(() => {
+                if (resultDiv) resultDiv.style.display = 'none';
+                closeDataEntryPanel();
+            }, 2000);
+        } else {
+            if (resultDiv) {
+                resultDiv.className = "update-result error";
+                resultDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Update failed: ${data.error || "Unknown error"}`;
+                resultDiv.style.display = "block";
+                setTimeout(() => resultDiv.style.display = 'none', 3000);
+            }
         }
-
-        // Refresh the dashboard
-        updateDashboard();
-
-        // Clear form
-        const capacityInput = document.getElementById('newCapacity');
-        if (capacityInput) capacityInput.value = '';
-
-        const notesInput = document.getElementById('updateNotes');
-        if (notesInput) notesInput.value = '';
-
-        // Close panel after delay
-        setTimeout(() => {
-            if (resultDiv) resultDiv.style.display = 'none';
-            closeDataEntryPanel();
-        }, 2000);
-    } else {
+    })
+    .catch(error => {
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
         if (resultDiv) {
-            resultDiv.className = 'update-result error';
-            resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Dam not found';
-            resultDiv.style.display = 'block';
+            resultDiv.className = "update-result error";
+            resultDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Network error during update`;
+            resultDiv.style.display = "block";
             setTimeout(() => resultDiv.style.display = 'none', 3000);
         }
-    }
+    });
 }
 
 // Make sure all functions are global
@@ -5605,7 +5630,6 @@ window.logout = logout;
 window.openDataEntryPanel = openDataEntryPanel;
 window.submitDamUpdate = submitDamUpdate;
 
-
 // ============ INITIALIZATION FUNCTION ============
 async function init() {
     console.log('🚀 Initializing ZWARMIS...');
@@ -5626,21 +5650,6 @@ async function init() {
 
 // Start the app
 init();
-
-// Make all functions global
-window.switchMapLayer = switchMapLayer;
-window.switchCRS = switchCRS;
-window.applyCustomCRS = applyCustomCRS;
-window.selectAnalyticsOption = selectAnalyticsOption;
-window.exportDataForSelectedDate = exportDataForSelectedDate;
-window.showWaterQualityAnalysis = showWaterQualityAnalysis;
-window.showWaterUsageAnalysis = showWaterUsageAnalysis;
-window.showDemandForecast = showDemandForecast;
-window.closeAnalyticsMenu = closeAnalyticsMenu;
-window.selectDataSource = selectDataSource;
-window.applyCatchmentFilter = applyCatchmentFilter;
-window.changeUserRole = changeUserRole;
-window.saveAllSettings = saveAllSettings;
     </script>
 
     <!-- Analytics Modal -->
