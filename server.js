@@ -139,7 +139,7 @@ app.get(['/dams-data.json', '/api/dams-data.json'], (req, res, next) => {
 });
 
 // Serve the frontend from the same local origin as the API
-app.use(express.static(path.join(__dirname, '../zwarmis-frontend')));
+app.use(express.static(path.join(__dirname, 'zwarmis-frontend')));
 
 // ============ ERROR HANDLING ============
 app.use((err, req, res, next) => {
