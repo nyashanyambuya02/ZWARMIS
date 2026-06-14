@@ -1,0 +1,186 @@
+ZWARMIS BACKEND - QUICK REFERENCE CARD
+=====================================
+
+🚀 START SERVER
+===============
+Windows:  double-click start.bat  OR  npm start
+Linux:    ./start.sh              OR  npm start
+Server runs on: http://localhost:3001
+
+📋 KEY ENDPOINTS
+================
+GET    /health                           - Server health
+GET    /api/admin/dams                   - Get all dams
+GET    /api/admin/dams/:damId            - Get one dam
+GET    /api/auth/status                  - Auth status
+POST   /api/auth/request-access          - Request access
+POST   /api/auth/verify-code             - Verify code (login)
+POST   /api/admin/update-dam             - Update dam (auth required)
+GET    /api/admin/history                - Get all history
+GET    /api/admin/history/:damId         - Get dam history
+POST   /api/auth/logout                  - Logout
+
+🔐 AUTHENTICATION FLOW
+======================
+1. POST /api/auth/request-access
+   Body: {username, userEmail, company, purpose}
+   → Check console for verification code
+
+2. POST /api/auth/verify-code
+   Body: {code}
+   → Get sessionId from cookie
+
+3. Use sessionId in cookies for authenticated requests
+   → Session expires after 30 minutes
+
+4. POST /api/auth/logout
+   → Destroy session
+
+📊 DAM UPDATE
+=============
+POST /api/admin/update-dam (requires auth)
+Body: {
+  "damId": "kariba",
+  "capacity_percent": 85.0,
+  "notes": "Weekly update"
+}
+
+🧪 QUICK TEST
+=============
+curl http://localhost:3001/health
+
+📁 FILE STRUCTURE
+=================
+zwarmis-backend/
+├── server.js          - Main server
+├── config.js          - Configuration
+├── storage.js         - In-memory database
+├── emailService.js    - Email sender
+├── routes/
+│   ├── auth.js        - Authentication
+│   └── admin.js       - DAM management
+├── dams-data.json     - DAM data
+├── package.json       - Dependencies
+└── README.md          - Full documentation
+
+⚙️ ENVIRONMENT
+==============
+.env file (optional):
+PORT=3001
+SESSION_SECRET=your-secret
+SMTP_USER=your-email@gmail.com (for real email)
+SMTP_PASS=app-password
+
+🛠️ TROUBLESHOOT
+================
+Port in use:
+  Windows: netstat -ano | findstr :3001
+           taskkill /PID <PID> /F
+  Linux:   lsof -i :3001
+           kill -9 <PID>
+
+CORS error: Check CORS_ORIGIN in config.js
+No data: Check dams-data.json exists
+Email: Demo mode prints codes to console
+
+📊 DEFAULT DAMS LOADED
+======================
+Kariba, Mutirikwi, Manyame, Chivero, Osborne,
++ 21 more dams from dams-data.json (26 total)
+
+🔍 DEMO MODE
+============
+Default behavior:
+- Verification codes printed to console
+- No real emails sent
+- Data in memory only
+- Perfect for testing
+
+To enable real email:
+1. Get Gmail App Password
+2. Set SMTP_USER and SMTP_PASS in .env
+3. Restart server
+
+💾 DATA STORAGE
+===============
+Current: In-memory (lost on restart)
+Production: MongoDB, PostgreSQL, etc.
+
+Sessions: HTTP-only cookies (30 min)
+Codes: 6 digits, expire in 10 min, max 5 attempts
+Users: Stored after verification
+
+📝 API RESPONSE FORMAT
+======================
+Success:
+{
+  "success": true,
+  "data": {...}
+}
+
+Error:
+{
+  "success": false,
+  "error": "Description"
+}
+
+🌐 FRONTEND CONNECTION
+======================
+Backend URL: http://localhost:3001
+CORS enabled for: localhost:3000, localhost:3001
+Requires: credentials: 'include' in fetch
+
+👤 DAM STATUS LEVELS
+====================
+Normal:  > 80%
+Caution: 60-80%
+Warning: < 60%
+
+📞 SUPPORT
+==========
+Check: README.md, API_REFERENCE.md, TESTING.md
+Logs: Console output when running
+Errors: Check browser console + server console
+
+🎯 NEXT STEPS
+=============
+1. Start backend: npm start
+2. Open frontend: index.html
+3. Click "Add/Update Data"
+4. Complete authentication
+5. Update dam capacities
+6. View on map and dashboard
+
+✅ PRODUCTION CHECKLIST
+=======================
+[ ] Set SESSION_SECRET in .env
+[ ] Enable HTTPS/SSL
+[ ] Setup real database
+[ ] Configure email service
+[ ] Set CORS_ORIGIN correctly
+[ ] Implement rate limiting
+[ ] Add request logging
+[ ] Setup monitoring
+[ ] Configure backups
+[ ] Test security
+
+🔒 SECURITY NOTES
+=================
+- Sessions expire (30 min)
+- HttpOnly cookies (production)
+- CORS protection enabled
+- Input validation implemented
+- Max 5 auth attempts
+- Code expiry (10 min)
+
+Consider for production:
+- JWT tokens
+- Password hashing (bcrypt)
+- Rate limiting
+- Audit logging
+- Encryption
+
+===================================
+ZWARMIS Backend v1.0
+Zimbabwe Water Resource Monitoring
+===================================
