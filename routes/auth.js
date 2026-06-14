@@ -192,8 +192,8 @@ async function handleRequestAccess(req, res) {
 router.post('/request-access', handleRequestAccess);
 
 // Fallback for frontend
-// Wait, the frontend might call POST /api/send-verification-code (without /auth)
-// If it does, we need to map it in server.js. But let's export it just in case.
+
+
 router.post('/send-verification-code', handleRequestAccess);
 
 router.post('/resend-verification-code', async (req, res) => {

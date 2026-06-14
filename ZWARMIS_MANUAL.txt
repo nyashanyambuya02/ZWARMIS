@@ -1,0 +1,49 @@
+========================================================================
+                      ZWARMIS SYSTEM MANUAL
+========================================================================
+
+1. INTRODUCTION
+------------------------------------------------------------------------
+The Zimbabwe Water Resource Monitoring System (ZWARMIS) is a comprehensive web-based platform designed to track, manage, and analyze water levels across various dams and water bodies in Zimbabwe.
+
+The system provides real-time visualization of dam capacities, weather forecasts, and historical trends, enabling stakeholders to make informed decisions regarding water security, irrigation, and resource management.
+
+2. CORE FEATURES
+------------------------------------------------------------------------
+- Interactive Dashboard: Displays a high-level overview of national water capacity, including total volume, average capacity, and trend analysis.
+- Live Map Visualization: Plots dams across Zimbabwe on an interactive map, color-coded by their current status (e.g., Optimal, Warning, Critical).
+- Weather Cast: Integrates live meteorological data (temperature, rainfall, conditions) for various regions to correlate weather patterns with water levels.
+- AI-Powered Analytics: Offers statistical insights (averages, medians, standard deviations) and AI-generated assessments based on current data.
+- Secure Data Entry: Allows authorized personnel to update dam capacity readings through a secure, authenticated interface.
+
+3. HOW IT WORKS
+------------------------------------------------------------------------
+A. Data Presentation
+When you load the ZWARMIS dashboard, the system fetches the latest dam capacity data and meteorological information. This data is instantly populated into interactive charts (like capacity distribution pies and historical trend graphs) and the live map.
+
+B. Authentication & Data Entry
+To maintain data integrity, updating dam capacities requires authorization:
+  1. Click "Add/Update Data".
+  2. Enter your credentials (Name, Email, Organization, Purpose).
+  3. The system sends a 6-digit verification code to your email (or logs it to the server console if running in Demo Mode).
+  4. Enter the 6-digit code to verify your identity.
+  5. Once authenticated, select a dam from the dropdown menu, enter the new capacity percentage, and add any relevant notes.
+  6. Click submit. The backend server records the update, adjusts the dam's status (Normal, Caution, Warning, or Critical), and immediately reflects the new data on the dashboard.
+
+C. Analytics & AI Insights
+Users can click on various analytics buttons (e.g., National Average, Median Capacity) to view detailed statistical breakdowns. If configured, the system uses AI to process these statistics and provide a readable, expert summary of what the data means for Zimbabwe's water security.
+
+4. SYSTEM ARCHITECTURE
+------------------------------------------------------------------------
+- Frontend: Built using modern HTML, CSS, and JavaScript, leveraging libraries like Chart.js (for graphs), Leaflet.js (for maps), and Swiper (for the weather cast carousel).
+- Backend: Powered by Node.js and Express.js. It handles API requests, email verification, session management, and data storage.
+- Data Storage: Currently utilizes an in-memory JSON structure (dams-data.json) to store dam profiles, historical updates, and rainfall metrics.
+
+5. STATUS DEFINITIONS
+------------------------------------------------------------------------
+- Normal / Optimal: Capacity >= 80% (Typically green/blue indicators)
+- Caution / Moderate: Capacity between 60% and 79% (Typically yellow/orange indicators)
+- Warning / Critical: Capacity < 60% (Typically red indicators)
+
+========================================================================
+© 2026 Zimbabwe Water Resource Monitoring System. All rights reserved.
